@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0",
+  "id": "mcp-chat-server",
+  "name": "MCP Chat Server",
+  "description": "Multi-AI group chat orchestration server for MCP clients.",
+  "version": "1.0.0",
+  "license": "MIT",
+  "homepage": "https://github.com/954510662-bot/mcp-chat",
+  "repository": "https://github.com/954510662-bot/mcp-chat",
+  "transport": {
+    "stdio": {
+      "command": "npx",
+      "args": ["-y", "mcp-chat-server"],
+      "env": [
+        "OPENAI_API_KEY",
+        "OPENAI_BASE_URL",
+        "DEFAULT_MODEL",
+        "MCP_PERSISTENCE",
+        "MCP_STORE_FILE"
+      ]
+    },
+    "http": {
+      "endpoint": "http://127.0.0.1:3000/mcp",
+      "auth": "bearer"
+    }
+  },
+  "tools": [
+    "server_info",
+    "create_group",
+    "send_message",
+    "get_messages",
+    "summarize_group",
+    "list_groups",
+    "delete_group",
+    "cleanup_groups"
+  ],
+  "install_hint": "Use npx -y mcp-chat-server in MCP client config."
+}

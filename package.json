@@ -1,0 +1,45 @@
+{
+  "name": "mcp-chat-server",
+  "version": "1.0.0",
+  "description": "Multi-AI group chat MCP server",
+  "license": "MIT",
+  "author": "mcp-chat contributors",
+  "homepage": "https://github.com/954510662-bot/mcp-chat",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/954510662-bot/mcp-chat.git"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "ai",
+    "multi-agent",
+    "chat"
+  ],
+  "type": "module",
+  "bin": {
+    "mcp-chat": "src/server.js"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "start:http": "node src/server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "compatibility.md",
+    ".env.example",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "zod": "^4.1.12"
+  }
+}
