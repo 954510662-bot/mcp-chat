@@ -17,13 +17,23 @@
     "chat"
   ],
   "type": "module",
+  "main": "src/index.js",
   "bin": {
-    "mcp-chat": "src/server.js"
+    "mcp-chat": "platform.js",
+    "mcp-chat-server": "src/server.js"
+  },
+  "exports": {
+    ".": "./src/index.js",
+    "./agents": "./src/agents/index.js",
+    "./tools": "./src/tools/toolManager.js",
+    "./platform": "./src/platform/multiAgentPlatform.js"
   },
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "node --watch src/server.js",
-    "start:http": "node src/server.js"
+    "start": "node platform.js",
+    "start:http": "node http-server.js",
+    "start:mcp": "node src/server.js",
+    "dev": "node --watch platform.js",
+    "example": "node example-usage.js"
   },
   "engines": {
     "node": ">=18"
@@ -40,6 +50,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
+    "dotenv": "^17.4.2",
     "zod": "^4.1.12"
   }
 }

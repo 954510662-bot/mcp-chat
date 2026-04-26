@@ -1,6 +1,6 @@
 import { okResponse } from "../utils/toolResponse.js";
 
-export function registerServerInfoTool(server) {
+export function registerServerInfoTool(server, dispatcher) {
   server.registerTool(
     "server_info",
     {
@@ -20,9 +20,24 @@ export function registerServerInfoTool(server) {
           "list_groups",
           "delete_group",
           "cleanup_groups",
+          "dispatch_task",
+          "get_task",
           "server_info"
         ],
-        providers: ["echo", "openai-compatible"]
+        providers: ["echo", "openai-compatible"],
+        connectors: dispatcher
+          ? Array.from(dispatcher.connectors.keys()).map((name) => ({
+              name,
+              timeout: dispatcher.connectors.get(name)?.timeoutMs ?? 30000
+            }))
+          : [],
+        features: [
+          "concurrent-task-execution",
+          "connector-timeout",
+          "shared-memory",
+          "task-ttl-cleanup",
+          "store-interface-unification"
+        ]
       };
       const result = okResponse(payload, JSON.stringify(payload, null, 2));
 

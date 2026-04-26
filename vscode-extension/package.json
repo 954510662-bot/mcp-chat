@@ -1,0 +1,102 @@
+{
+  "name": "mcp-chat",
+  "displayName": "MCP 多 Agent 协作平台",
+  "description": "多 AI Agent 协作开发平台，支持架构设计、代码生成、部署运维",
+  "version": "1.0.0",
+  "publisher": "mcp-chat",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "AI",
+    "Chat",
+    "Other"
+  ],
+  "keywords": [
+    "ai",
+    "agent",
+    "multi-agent",
+    "chat",
+    "assistant",
+    "mcp"
+  ],
+  "icon": "resources/icon.png",
+  "activationEvents": [
+    "onCommand:mcp-chat.start",
+    "onView:mcp-chat-sidebar"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "mcp-chat.start",
+        "title": "MCP Chat: 打开多 Agent 协作平台"
+      },
+      {
+        "command": "mcp-chat.newTask",
+        "title": "MCP Chat: 新建任务"
+      },
+      {
+        "command": "mcp-chat.clearHistory",
+        "title": "MCP Chat: 清空历史"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "mcp-chat",
+          "title": "MCP 多 Agent",
+          "icon": "resources/sidebar.svg"
+        }
+      ]
+    },
+    "views": {
+      "mcp-chat": [
+        {
+          "id": "mcp-chat-sidebar",
+          "name": "Agent 面板",
+          "type": "webview"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "MCP 多 Agent 协作平台",
+      "properties": {
+        "mcp-chat.maxContextSize": {
+          "type": "number",
+          "default": 100000,
+          "description": "最大上下文字符数"
+        },
+        "mcp-chat.enableAutoDeploy": {
+          "type": "boolean",
+          "default": false,
+          "description": "启用自动部署确认"
+        },
+        "mcp-chat.workspacePath": {
+          "type": "string",
+          "default": "",
+          "description": "Agent 工作区路径"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.80.0",
+    "eslint": "^8.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "compile": "^0.0.2",
+    "mcp-chat-core": "file:../",
+    "npm": "^11.13.0",
+    "run": "^1.5.0"
+  }
+}

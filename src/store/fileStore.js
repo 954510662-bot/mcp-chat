@@ -7,6 +7,7 @@ export class FileStore {
     this.filePath = filePath;
     this.groups = new Map();
     this.messages = new Map();
+    this.tasks = new Map();
     this.writeQueue = Promise.resolve();
   }
 
@@ -29,14 +30,26 @@ export class FileStore {
     }
 
     const parsed = JSON.parse(raw);
-    this.groups = new Map((parsed.groups ?? []).map((g) => [g.id, g]));
+    this.groups = new Map(
+      (parsed.groups ?? []).map((g) => {
+        if (g.sharedMemory) {
+          g.sharedMemory = new Map(g.sharedMemory);
+        }
+        return [g.id, g];
+      })
+    );
     this.messages = new Map(parsed.messages ?? []);
+    this.tasks = new Map((parsed.tasks ?? []).map((t) => [t.id, t]));
   }
 
   snapshot() {
     return {
-      groups: Array.from(this.groups.values()),
-      messages: Array.from(this.messages.entries())
+      groups: Array.from(this.groups.values()).map((g) => ({
+        ...g,
+        sharedMemory: g.sharedMemory ? Array.from(g.sharedMemory.entries()) : undefined
+      })),
+      messages: Array.from(this.messages.entries()),
+      tasks: Array.from(this.tasks.values())
     };
   }
 
@@ -85,7 +98,53 @@ export class FileStore {
     const deletedGroup = this.groups.get(groupId) ?? null;
     this.groups.delete(groupId);
     this.messages.delete(groupId);
+    this.cleanupTasksByGroup(groupId);
     this.enqueuePersist();
     return deletedGroup;
+  }
+
+  saveTask(task) {
+    this.tasks.set(task.id, task);
+    this.enqueuePersist();
+    return task;
+  }
+
+  getTask(taskId) {
+    return this.tasks.get(taskId) ?? null;
+  }
+
+  listTasks(groupId) {
+    const all = Array.from(this.tasks.values());
+    return groupId ? all.filter((t) => t.groupId === groupId) : all;
+  }
+
+  deleteTask(taskId) {
+    const task = this.tasks.get(taskId) ?? null;
+    this.tasks.delete(taskId);
+    this.enqueuePersist();
+    return task;
+  }
+
+  cleanupTasksByGroup(groupId) {
+    const toDelete = this.listTasks(groupId);
+    for (const t of toDelete) {
+      this.tasks.delete(t.id);
+    }
+    return toDelete.length;
+  }
+
+  cleanupExpiredTasks(maxAgeMs) {
+    const now = Date.now();
+    const expired = Array.from(this.tasks.values()).filter((t) => {
+      const createdAt = new Date(t.createdAt).getTime();
+      return now - createdAt > maxAgeMs;
+    });
+    for (const t of expired) {
+      this.tasks.delete(t.id);
+    }
+    if (expired.length > 0) {
+      this.enqueuePersist();
+    }
+    return expired.length;
   }
 }

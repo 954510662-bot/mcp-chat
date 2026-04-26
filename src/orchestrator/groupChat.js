@@ -30,7 +30,8 @@ export class GroupChatOrchestrator {
       id: randomUUID(),
       name,
       members: normalizedMembers,
-      createdAt: nowIso()
+      createdAt: nowIso(),
+      sharedMemory: new Map()
     });
 
     return group;

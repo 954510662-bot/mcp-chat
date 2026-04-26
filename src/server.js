@@ -1,9 +1,12 @@
+import "dotenv/config";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { MemoryStore } from "./store/memoryStore.js";
 import { FileStore } from "./store/fileStore.js";
 import { createProviderRegistry } from "./providers/index.js";
+import { createConnectorRegistry } from "./connectors/index.js";
 import { GroupChatOrchestrator } from "./orchestrator/groupChat.js";
+import { TaskDispatcher } from "./platform/taskDispatcher.js";
 import { registerCreateGroupTool } from "./tools/createGroup.js";
 import { registerSendMessageTool } from "./tools/sendMessage.js";
 import { registerGetMessagesTool } from "./tools/getMessages.js";
@@ -12,6 +15,8 @@ import { registerServerInfoTool } from "./tools/serverInfo.js";
 import { registerListGroupsTool } from "./tools/listGroups.js";
 import { registerDeleteGroupTool } from "./tools/deleteGroup.js";
 import { registerCleanupGroupsTool } from "./tools/cleanupGroups.js";
+import { registerDispatchTaskTool } from "./tools/dispatchTask.js";
+import { registerGetTaskTool } from "./tools/getTask.js";
 import { startHttpServer } from "./transports/httpServer.js";
 
 function buildServer(store, retentionDays) {
@@ -21,7 +26,9 @@ function buildServer(store, retentionDays) {
   });
 
   const providers = createProviderRegistry();
+  const connectors = createConnectorRegistry();
   const orchestrator = new GroupChatOrchestrator({ store, providers, retentionDays });
+  const dispatcher = new TaskDispatcher({ store, connectors });
 
   registerCreateGroupTool(server, orchestrator);
   registerSendMessageTool(server, orchestrator);
@@ -30,7 +37,9 @@ function buildServer(store, retentionDays) {
   registerListGroupsTool(server, orchestrator);
   registerDeleteGroupTool(server, orchestrator);
   registerCleanupGroupsTool(server, orchestrator);
-  registerServerInfoTool(server);
+  registerDispatchTaskTool(server, dispatcher);
+  registerGetTaskTool(server, dispatcher);
+  registerServerInfoTool(server, dispatcher);
 
   return server;
 }
@@ -52,6 +61,11 @@ async function main() {
       if (cleanupResult.deletedCount > 0) {
         console.error(`startup cleanup deleted ${cleanupResult.deletedCount} groups`);
       }
+
+      const deletedTasks = store.cleanupExpiredTasks(retentionDays * 24 * 60 * 60 * 1000);
+      if (deletedTasks > 0) {
+        console.error(`startup cleanup deleted ${deletedTasks} expired tasks`);
+      }
     }
 
     await startHttpServer({
@@ -67,6 +81,11 @@ async function main() {
     const cleanupResult = cleanupOrchestrator.cleanupExpiredGroups();
     if (cleanupResult.deletedCount > 0) {
       console.error(`startup cleanup deleted ${cleanupResult.deletedCount} groups`);
+    }
+
+    const deletedTasks = store.cleanupExpiredTasks(retentionDays * 24 * 60 * 60 * 1000);
+    if (deletedTasks > 0) {
+      console.error(`startup cleanup deleted ${deletedTasks} expired tasks`);
     }
   }
 
