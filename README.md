@@ -28,6 +28,22 @@ Run directly without local install:
 npx -y mcp-chat-server
 ```
 
+## GitHub-First Distribution (No npm Required)
+
+For users who cannot use npm publishing/login, distribute via GitHub repository directly:
+
+```bash
+git clone https://github.com/954510662-bot/mcp-chat.git
+cd mcp-chat
+npm install
+npm start
+```
+
+Recommended trust checks for users:
+- Verify repository URL and commit/tag before running.
+- Review source code in `src/` directly.
+- Prefer running from tagged release (for example `v1.0.0`).
+
 ## Run
 
 ```bash
@@ -81,6 +97,7 @@ Persistence defaults to local file `./data/store.json`.
 ## Compatibility
 
 See `compatibility.md` for OpenClaw / Claude Code / Hermes Agent integration templates.
+For a minimal setup flow, see `QUICKSTART.md`.
 
 ## Marketplace Ready
 

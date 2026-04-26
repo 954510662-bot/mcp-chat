@@ -11,6 +11,14 @@ Use `server_info` tool to probe capabilities from clients.
 
 Use stdio mode for local development.
 
+GitHub-first setup:
+
+```bash
+git clone https://github.com/954510662-bot/mcp-chat.git
+cd mcp-chat
+npm install
+```
+
 ```json
 {
   "mcpServers": {
@@ -43,6 +51,10 @@ Use stdio mode for local development.
 }
 ```
 
+If npm package is unavailable, keep using local repository path:
+- `command`: `node`
+- `args`: `["d:/path/to/mcp-chat/src/server.js"]`
+
 ## 3) Hermes Agent style (HTTP mode template)
 
 Start server:
@@ -64,3 +76,4 @@ Then point Hermes MCP endpoint to:
 - Different clients use slightly different config schema keys (`mcpServers`, `servers`, etc.).
 - Keep tool names stable for best compatibility across clients.
 - For internet-facing deployment, put `/mcp` behind a gateway and auth.
+- GitHub repository for distribution: `https://github.com/954510662-bot/mcp-chat`
